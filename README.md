@@ -1,4 +1,3 @@
-# Carpooling-Simulation
 <!DOCTYPE html>
 <html lang="en">
 <head>
