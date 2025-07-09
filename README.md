@@ -1,222 +1,186 @@
-<<<<<<< HEAD
-# 🚗 Carpooling Simulation 🚗
-=======
-🚗 Carpooling Simulation 🚗
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
+# 🚗 Carpooling Simulation System 🚗
 
-Welcome to the **Carpooling Simulation**! This project aims to revolutionize the carpooling experience by utilizing cutting-edge **matching algorithms** and **machine learning models** to create smarter, more efficient, and environmentally friendly ride-sharing solutions.  
-With a strong focus on user experience and backend optimization, this system offers a seamless interface for carpool users while ensuring optimal route matching and predictions.
+![Carpooling Banner](https://img.shields.io/badge/Carpooling-Simulation-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.8+-blue)
+![Flask](https://img.shields.io/badge/Flask-2.0.1-lightblue)
+![ML](https://img.shields.io/badge/ML-Scikit--learn-orange)
 
----
+Welcome to the **Carpooling Simulation System**! This project creates an intelligent carpooling experience by utilizing AI algorithms to optimize ride-sharing between Madiwala and Attibele in Bangalore. The system employs machine learning to match passengers with the most suitable drivers based on location, direction, and available space.
 
-<<<<<<< HEAD
-## 🔥 Features
+## ✨ Features
 
-- **Carpool Matching Algorithm**: An intelligent matching algorithm that connects users based on their travel routes and preferences, optimizing carpooling efficiency.
-- **Machine Learning Integration**: Powerful ML models that enhance carpool prediction accuracy, ensuring that the most optimal routes and ride-sharing opportunities are provided.
-- **Web Interface**: A responsive and user-friendly interface built with *Flask* for Python backend.
-- **Simulation Environment**: Test out different carpooling scenarios with the simulation scripts to optimize and assess the performance of carpooling solutions in various conditions.
-- **Real-time Updates**: Live simulation with real-time car movement and request processing.
-- **AI-based Assignment**: Uses scikit-learn's Nearest Neighbors algorithm for optimal car-passenger matching.
-
----
-
-## 🌍 Project Structure
-=======
-🔥 Features
-
-- **Carpool Matching Algorithm**: An intelligent matching algorithm that connects users based on their travel routes and preferences, optimizing carpooling efficiency.
-- **Machine Learning Integration**: Powerful ML models that enhance carpool prediction accuracy, ensuring that the most optimal routes and ride-sharing opportunities are provided.
-- **Web Interface**: A responsive and user-friendly interface built with *Flask* for Python and *Node.js* for the backend.
-- **Simulation Environment**: Test out different carpooling scenarios with the simulation scripts to optimize and assess the performance of carpooling solutions in various conditions.
-
----
-
-🌍 Project Structure
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
-
-The repository is structured for easy navigation and scalability:
-
-```
-.
-<<<<<<< HEAD
-├── app.py                # Main Flask application file
-├── simulation.py         # Carpooling simulation script
-├── README.md             # Project documentation (this file)
-├── requirements.txt      # Python dependencies
-=======
-├── app.py                # Main application file (Flask-based backend)
-├── matching_algorithm.py # Core carpool matching algorithm
-├── ml                    # Machine learning models and scripts
-├── ml_models.py          # Integration with ML models
-├── models                # Database models for carpooling data
-├── models.py             # Definition of database models
-├── package.json          # Node.js package configuration
-├── public                # Public assets (CSS, JS, images)
-├── README.md             # Project documentation (this file)
-├── requirements.txt      # Python dependencies
-├── routes                # API routes (RESTful endpoints)
-├── server.js             # Node.js server configuration
-├── simulation            # Simulation scripts for testing carpooling
-├── simulation.py         # Carpooling simulation script
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
-├── static                # Static files (images, stylesheets, etc.)
-├── templates             # HTML templates for the frontend
-└── __pycache__           # Compiled Python files
-```
-
----
-
-<<<<<<< HEAD
-## 📦 Installation
-=======
-📦 Installation
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
-
-To set up the **Carpool Project (Phase 3)** on your local machine:
-
-1. **Clone the repository**  
-   `git clone https://github.com/your-username/carpool-project-phase-3.git`  
-<<<<<<< HEAD
-   `cd "Inhance carpool-project (phase 3)"`
-=======
-   `cd Carpooling-Simulation`
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
-
-2. **Install Python dependencies**  
-   `pip install -r requirements.txt`
-
-<<<<<<< HEAD
-3. **Run the application**
-
-   - Start the **Flask** server:  
-     `python app.py`
-
-4. **Access the app**  
-   Visit the app in your browser at [http://127.0.0.1:5000](http://127.0.0.1:5000).
-
----
+- **🤖 AI-Powered Matching**: Uses scikit-learn's Nearest Neighbors algorithm to assign pickup requests to the most suitable car
+- **🚌 Real-Time Simulation**: Live simulation with real-time car movement and request processing
+- **🗺️ Dynamic Routing**: Cars move along predefined routes between Madiwala and Attibele
+- **👥 Capacity Management**: Each car has 4 seats with intelligent passenger assignment
+- **🔄 Interactive Interface**: Web-based UI to visualize and control the simulation
+- **📱 Custom Bookings**: Create named passenger requests with specific pickup and dropoff points
+- **🔍 Location Awareness**: Car assignment based on proximity and direction of travel
 
 ## 🛠️ Technologies Used
 
 - **Backend**: Python (Flask)
 - **Frontend**: HTML, CSS, JavaScript
-- **Machine Learning**: Python (scikit-learn, NumPy)
+- **Machine Learning**: scikit-learn (Nearest Neighbors), NumPy
 - **Real-time Processing**: Threading for simulation updates
+- **Data Structures**: Custom car, passenger and request models
 
 ---
 
-## 🚀 How It Works
+## 🚗 Carpooling Simulation – Smart AI Ride Matching
 
-1. The simulation creates 8 cars with 3 passengers each
-2. Cars move along predefined routes between Madiwala and Attibele
-3. Random pickup requests can be added during the simulation
-4. The ML model assigns requests to the nearest available car going in the correct direction
-5. Passengers are picked up and dropped off at their specified locations
+Welcome to the **Carpooling Simulation**! This project is designed to showcase the future of urban mobility by leveraging advanced **AI-driven matching algorithms** and **machine learning** to optimize carpooling between Banashankari and Attibele in Bangalore.
 
-## 🎯 AI/ML Component
+With a focus on seamless user experience and backend intelligence, this simulation demonstrates how technology can make ride-sharing smarter, greener, and more efficient.
 
-The project uses scikit-learn's Nearest Neighbors algorithm to assign pickup requests to the most suitable car based on:
-- Current location
-- Direction of travel
-- Available space
+---
 
-## 🗺️ Routes
+## ✨ Features
 
-The simulation includes the following locations along the route:
-- Madiwala
+- **AI Carpool Matching:** Assigns ride requests to the most suitable car using ML-based nearest neighbor algorithms.
+- **Dynamic Simulation:** Real-time car movement, passenger pick-up/drop-off, and live demand visualization.
+- **Interactive Web Interface:** Modern, responsive UI with map integration and live statistics.
+- **Custom & Emergency Bookings:** Users can create custom bookings or trigger emergency requests.
+- **Automatic Fleet Scaling:** System auto-activates cars based on demand hotspots.
+- **Traffic Visualization:** Simulated traffic overlays for realistic routing.
+
+---
+
+## 🗂️ Project Structure
+
+```
+.
+├── app.py                   # Flask backend server
+├── simulation.py            # Core simulation logic
+├── models.py                # Data models for Car, Passenger, Request
+├── requirements.txt         # Python dependencies
+├── templates/
+│   └── index.html           # Main web interface
+├── static/
+│   ├── styles.css           # Main styles
+│   ├── css/map-styles.css   # Map-specific styles
+│   └── js/map-integration.js# Map and UI logic
+└── README.md                # Project documentation
+```
+
+---
+
+## 🚀 Getting Started
+
+**1. Clone the repository**
+```bash
+git clone https://github.com/your-username/carpooling-simulation.git
+cd carpooling-simulation
+```
+
+**2. Install Python dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+**3. Run the application**
+```bash
+python app.py
+```
+
+**4. Open your browser**
+```
+http://127.0.0.1:5000/
+```
+
+---
+
+## 🛠️ Technologies Used
+
+- **Backend:** Python (Flask)
+- **Frontend:** HTML, CSS, JavaScript, Leaflet.js
+- **Machine Learning:** scikit-learn (Nearest Neighbors)
+- **Visualization:** OpenStreetMap, Leaflet
+
+---
+
+## 🧠 How It Works
+
+1. **Simulation Initialization:** 8 cars (4 each direction) are created with initial passengers.
+2. **Live Movement:** Cars move along a real Bangalore route, picking up and dropping off passengers.
+3. **AI Matching:** New ride requests are assigned to the nearest available car going in the right direction.
+4. **Demand Response:** If requests spike at a location, the system auto-adds cars to meet demand.
+5. **Custom & Emergency Requests:** Users can book rides with their name or trigger urgent pickups.
+
+---
+
+## 🗺️ Route Map
+
+The simulation covers these real Bangalore locations:
+
+- Banashankari
+- Jayanagar
+- BTM Layout
+- Silk Board
+- HSR Layout
 - Bommanahalli
-- Singasandra
-- Electronic City
+- Kudlu Gate
+- Hosa Road
+- Electronic City Phase 1 & 2
+- Neeladri Road
 - Huskur Gate
+- Hebbagodi
+- Bommasandra
+- Jigani
 - Chandapura
-- Heelalige
+- Hennagara
+- Anekal
+- Marsur
+- Jigani Cross
+- Sarjapur
+- Dommasandra
+- Carmelaram
+- Ambedkar Nagar
+- Kodathi
+- Mugalur
+- Sarjapur Circle
+- Attibele Industrial Area
+- Attibele Bus Stop
 - Attibele
 
 ---
 
 ## 🤝 Contributing
-=======
-3. **Install Node.js dependencies**  
-   `npm install`
 
-4. **Run the application**
+We welcome contributions! To add features or fix bugs:
 
-   - Start the **Flask** server:  
-     `python app.py`
-   - Start the **Node.js** server:  
-     `node server.js`
-
-5. **Access the app**  
-   Visit the app in your browser at [http://localhost:5000](http://localhost:5000).
+1. Fork the repo
+2. Create a new branch (`git checkout -b feature-name`)
+3. Commit your changes
+4. Push to your branch
+5. Open a pull request
 
 ---
 
-🛠️ Technologies Used
+## 📄 License
 
-- **Backend**: Python (Flask), Node.js
-- **Frontend**: HTML, CSS, JavaScript
-- **Machine Learning**: Python (scikit-learn, TensorFlow)
-- **Database**: SQL-based models for carpooling data management
+This project is licensed under the **MIT License**.
 
 ---
 
-🤝 Contributing
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
-
-We welcome contributions from the community! Feel free to fork the repository, create your own branch, and submit pull requests with bug fixes, new features, or enhancements.
-
-How to contribute:
-
-1. Fork this repository.
-2. Create a new branch (`git checkout -b feature-name`).
-3. Make your changes.
-4. Commit your changes (`git commit -am 'Add new feature'`).
-5. Push to the branch (`git push origin feature-name`).
-6. Submit a pull request.
-
----
-
-<<<<<<< HEAD
-## 📝 License
-=======
-📝 License
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
-
-This project is licensed under the **MIT License**. See the LICENSE file for more details.
-
----
-
-<<<<<<< HEAD
 ## 📬 Contact
-=======
-📬 Contact
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
 
-For any questions or inquiries, feel free to reach out to us at:  
-msaqhib76@gmail.com
+Questions or suggestions?  
+Email: msaqhib76@gmail.com
 
 ---
 
-<<<<<<< HEAD
-## 📊 Demo
-=======
-📊 Demo
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
+## 🌐 Demo
 
-Check out the live demo of the project in action:  
-[Live Demo](https://your-demo-link.com)
+A live demo will be available soon! Stay tuned.
 
 ---
 
-<<<<<<< HEAD
-## 👥 Acknowledgements
-=======
-👥 Acknowledgements
->>>>>>> 5d601d18bb80e3676a142e430a098ba7e711f058
+## 🙏 Acknowledgements
 
-We would like to thank the contributors and community members for their invaluable input into this project. Special thanks to the open-source libraries and tools that made this project possible.
+Special thanks to all contributors and the open-source community.  
+Powered by Python, Flask, scikit-learn, and OpenStreetMap.
 
 ---
 
-Enjoy carpooling smarter, greener, and faster with Carpooling Simulation! 🚗💚
+**Enjoy smarter, greener, and faster carpooling with Carpooling Simulation! 🚗💚**
