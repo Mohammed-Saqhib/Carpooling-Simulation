@@ -1,0 +1,262 @@
+/* Map-specific styles */
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.car-marker {
+    transition: transform 0.3s ease-in-out;
+}
+
+.car-marker:hover {
+    transform: scale(1.2) !important;
+    z-index: 1000 !important;
+}
+
+.car-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.car-icon.banashankari {
+    background-color: #3a7bd5;
+}
+
+.car-icon.attibele {
+    background-color: #9d4edd;
+}
+
+.request-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #e63946;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(230, 57, 70, 0.5);
+    animation: pulse 1.5s infinite;
+}
+
+.car-popup, .request-popup {
+    padding: 8px;
+    font-size: 13px;
+}
+
+.car-popup strong, .request-popup strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 3px;
+}
+
+.progress-bar-container {
+    height: 4px;
+    background-color: #eee;
+    border-radius: 2px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.3s ease;
+}
+
+/* Location markers */
+.location-marker {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.location-marker:hover {
+    opacity: 1;
+}
+
+/* Custom popup styling */
+.leaflet-popup-content-wrapper {
+    border-radius: 4px;
+    padding: 0;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    padding: 10px;
+}
+
+.demand-highlight {
+    animation: demand-pulse 1.5s infinite;
+}
+
+@keyframes demand-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7);
+    }
+    
+    70% {
+        box-shadow: 0 0 0 10px rgba(230, 57, 70, 0);
+    }
+    
+    100% {
+        box-shadow: 0 0 0 0 rgba(230, 57, 70, 0);
+    }
+}
+
+/* Add these styles */
+
+.pulsing-line {
+    animation: pulse-line 1.5s infinite;
+}
+
+@keyframes pulse-line {
+    0% {
+        stroke-opacity: 0.8;
+        stroke-width: 3;
+    }
+    50% {
+        stroke-opacity: 0.3;
+        stroke-width: 6;
+    }
+    100% {
+        stroke-opacity: 0.8;
+        stroke-width: 3;
+    }
+}
+
+.error-toast {
+    background-color: #ff3860 !important;
+    color: white;
+}
+
+#emergencyRequestBtn {
+    background-color: #ff3860;
+    color: white;
+    font-weight: bold;
+}
+
+#emergencyRequestBtn:hover {
+    background-color: #e71a48;
+}
+
+/* Enhanced styles for named passengers */
+.named-request-icon {
+    padding: 3px 8px;
+    background-color: #ff9800;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 12px;
+    border: 2px solid white;
+    white-space: nowrap;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    animation: bounce 1.5s infinite;
+}
+
+.named-passenger {
+    color: #ff9800;
+    font-weight: bold;
+    background-color: rgba(255, 152, 0, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin-bottom: 2px;
+}
+
+.passenger-name-tag {
+    padding: 3px 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #ff9800;
+    border: 1px solid #ff9800;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1000;
+    transform: translateY(-24px);
+}
+
+/* Animation for named requests */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+/* Custom booking form enhanced styling */
+#customBookingModal .modal-content {
+    max-width: 450px;
+    border-top: 5px solid #ff9800;
+}
+
+#customBookingModal h2 {
+    color: #ff9800;
+    margin-bottom: 15px;
+}
+
+#customBookingModal input, 
+#customBookingModal select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 15px;
+    transition: border 0.3s;
+}
+
+#customBookingModal input:focus,
+#customBookingModal select:focus {
+    border-color: #ff9800;
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 152, 0, 0.3);
+}
+
+#customBookingModal label {
+    font-weight: bold;
+    color: #444;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#confirmBooking {
+    background-color: #ff9800;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+#confirmBooking:hover {
+    background-color: #f57c00;
+}
+
+#confirmBooking:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Improve the "Custom Booking" button */
+.btn-success {
+    background-color: #ff9800 !important;
+}
+
+.btn-success:hover {
+    background-color: #f57c00 !important;
+}

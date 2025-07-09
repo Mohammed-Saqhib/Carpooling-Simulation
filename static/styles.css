@@ -1,0 +1,621 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.header {
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    margin-bottom: 5px;
+    font-size: 2.2rem;
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.container {
+    width: 95%;
+    max-width: 1400px;
+    margin: 20px auto;
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 20px;
+}
+
+.map-container {
+    position: relative;
+    height: 950px;  /* Increased height to accommodate the longer route */
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: auto;  /* Allow scrolling in the map for longer routes */
+    border: 1px solid #e0e0e0;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.controls {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background-color: #3a7bd5;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #e63946;
+    color: white;
+}
+
+.btn-tertiary {
+    background-color: #2a9d8f;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+h3 {
+    font-size: 1.3rem;
+    color: #3a7bd5;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.car-info, .request-info {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.car-card, .request-card {
+    background-color: #f8f9fa;
+    border-left: 4px solid #3a7bd5;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.car-card:hover, .request-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.request-card {
+    border-left: 4px solid #e63946;
+}
+
+.card-header {
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.passenger-count {
+    background-color: #3a7bd5;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+}
+
+.route {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.passengers-list {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 5px;
+}
+
+/* Map elements styling */
+.road {
+    position: absolute;
+    height: 6px;
+    background: linear-gradient(to right, #555, #777);
+    border-radius: 3px;
+    z-index: 1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.location {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: #2a9d8f;
+    border: 2px solid white;
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 0 2px rgba(42, 157, 143, 0.3);
+    transform: translate(-50%, -50%);
+}
+
+.location-label {
+    position: absolute;
+    font-size: 10px;  /* Smaller font for more locations */
+    color: #333;
+    font-weight: 500;
+    z-index: 2;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2px 5px;
+    border-radius: 3px;
+    transform: translate(0, -50%);
+    white-space: nowrap;
+}
+
+/* Every other location label will be positioned differently to avoid overlap */
+.location-label:nth-child(4n+1) {
+    transform: translate(0, -100%);  
+}
+
+.location-label:nth-child(4n+3) {
+    transform: translate(0, 0);
+}
+
+.car {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    /* No transition here - we're using requestAnimationFrame */
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, -50%);
+}
+
+.car-madiwala {
+    background-color: #3a7bd5;
+}
+
+.car-attibele {
+    background-color: #9d4edd;
+}
+
+.car-banashankari {
+    background-color: #3a7bd5;
+}
+
+.car:hover {
+    transform: scale(1.2);
+    z-index: 4;
+}
+
+/* Car movement trail effect */
+.car::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.5;
+    transform: scale(0.7);
+    animation: trail 1s infinite;
+}
+
+@keyframes trail {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.7);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+}
+
+.request {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #e63946;
+    border: 2px solid white;
+    border-radius: 50%;
+    z-index: 3;
+    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 5px rgba(230, 57, 70, 0.5);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7);
+    }
+    
+    70% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 10px rgba(230, 57, 70, 0);
+    }
+    
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(230, 57, 70, 0);
+    }
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #3a7bd5;
+    margin: 5px 0;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Tooltip styling */
+.tooltip {
+    position: absolute;
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+    
+    .map-container {
+        height: 450px;
+    }
+}
+
+/* Add these rules to your existing CSS file */
+
+.inactive-car {
+    opacity: 0.6;
+    border-left: 4px solid #999;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.active-badge {
+    background-color: #4caf50;
+    color: white;
+}
+
+.inactive-badge {
+    background-color: #999;
+    color: white;
+}
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    max-width: 80%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 5px;
+}
+
+/* Toast notification */
+#toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    border-radius: 4px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+/* Pulse animation for highlighted locations */
+.location-pulse {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: rgba(33, 150, 243, 0);
+    border: 3px solid #2196F3;
+    z-index: 5;
+    transform: translate(-50%, -50%);
+    animation: location-pulse 3s infinite;
+}
+
+@keyframes location-pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+        border-width: 3px;
+    }
+    70% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2);
+        border-width: 1px;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.5);
+        border-width: 0;
+    }
+}
+
+/* Different toast types */
+#toast.success-toast {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#toast.info-toast {
+    background-color: #2196F3;
+    color: white;
+}
+
+/* OpenRouteService Map Styling */
+
+.car-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #d63031;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.request-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #e63946;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(230, 57, 70, 0.5);
+    animation: pulse 1.5s infinite;
+}
+
+.car-popup, .request-popup {
+    padding: 5px;
+}
+
+.leaflet-popup-content {
+    margin: 10px;
+}
+
+/* Map controls */
+.map-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+}
+
+.map-controls button {
+    padding: 5px 10px;
+    margin: 2px;
+    background-color: #3388ff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.map-controls button:hover {
+    background-color: #2370d8;
+}
+
+/* Custom booking button */
+.btn-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #3e8e41;
+}
+
+/* Custom styles for named passengers */
+.passenger-name-tag {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;
+    border: 1px solid #3388ff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* Custom booking form */
+#customBookingModal .modal-content {
+    max-width: 450px;
+}
+
+#customBookingModal input, 
+#customBookingModal select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.error-toast {
+    background-color: #f44336 !important;
+}
+
+.passenger-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #ff9800;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom booking request marker with name */
+.named-request-icon {
+    padding: 2px 5px;
+    background-color: #ff9800;
+    color: white;
+    font-size: 10px;
+    border-radius: 10px;
+    border: 2px solid white;
+    white-space: nowrap;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}

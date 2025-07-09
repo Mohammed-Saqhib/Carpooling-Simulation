@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carpool Simulation with AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map-styles.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Carpool AI Simulation</h1>
+        <p>Simulating intelligent carpooling between Banashankari and Attibele in Bangalore</p>
+    </div>
+
+    <div class="container">
+        <div class="map-container">
+            <div id="map">
+                <!-- OpenRouteService map will be rendered here -->
+            </div>
+            <div class="map-controls">
+                <button id="zoomToRoute">Zoom to Route</button>
+                <button id="toggleTraffic">Show Traffic</button>
+                <button id="emergencyRequestBtn">Emergency Request</button>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="button-group">
+                <button id="startBtn" class="btn btn-primary">Start</button>
+                <button id="stopBtn" class="btn btn-secondary">Stop</button>
+                <button id="randomRequestBtn" class="btn btn-tertiary">New Request</button>
+                <button id="addCarBtn" class="btn btn-primary">Add Car</button>
+                <button id="customBookingBtn" class="btn btn-success">Custom Booking</button>
+            </div>
+            
+            <div class="section">
+                <h3>Simulation Statistics</h3>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="active-cars">0</div>
+                        <div class="stat-label">Active Cars</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-passengers">0</div>
+                        <div class="stat-label">Passengers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pending-requests">0</div>
+                        <div class="stat-label">Pending Requests</div>
+                    </div>
+                </div>
+                
+                <div class="simulation-speed">
+                    <label for="speed-control">Simulation Speed:</label>
+                    <input type="range" id="speed-control" min="1" max="5" value="2">
+                    <span id="speed-value">Normal</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Active Cars</h3>
+                <div id="cars-info" class="car-info">
+                    <div class="placeholder">Start the simulation to see cars</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Pending Requests</h3>
+                <div id="requests-info" class="request-info">
+                    <div class="placeholder">No pending requests</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding cars -->
+    <div id="addCarModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add New Car</h2>
+            <div class="form-group">
+                <label for="locationSelect">Location:</label>
+                <select id="locationSelect" class="form-control">
+                    <!-- Will be populated with locations -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Direction:</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="direction" value="to_attibele" checked> 
+                        To Attibele
+                    </label>
+                    <label>
+                        <input type="radio" name="direction" value="to_banashankari"> 
+                        To Banashankari
+                    </label>
+                </div>
+            </div>
+            <button id="confirmAddCar" class="btn btn-primary">Add Car</button>
+        </div>
+    </div>
+
+    <div id="emergencyModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Emergency Pickup Request</h2>
+            <p>Select a location for urgent pickup:</p>
+            <div class="form-group">
+                <select id="emergencyLocationSelect" class="form-control">
+                    <!-- Will be populated with locations -->
+                </select>
+            </div>
+            <button id="findNearestCarBtn" class="btn btn-secondary">Find Nearest Car</button>
+        </div>
+    </div>
+
+    <!-- Modal for custom booking -->
+    <div id="customBookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create Custom Booking</h2>
+            <div class="form-group">
+                <label for="passengerName">Your Name:</label>
+                <input type="text" id="passengerName" class="form-control" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label for="pickupSelect">Pickup Location:</label>
+                <select id="pickupSelect" class="form-control">
+                    <!-- Will be populated with locations -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dropoffSelect">Dropoff Location:</label>
+                <select id="dropoffSelect" class="form-control">
+                    <!-- Will be populated with locations -->
+                </select>
+            </div>
+            <button id="confirmBooking" class="btn btn-primary">Book Now</button>
+        </div>
+    </div>
+
+    <!-- Include Leaflet library for maps -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/map-integration.js') }}"></script>
+    
+    <script>
+        // Simulation variables
+        let simulationSpeed = 2000; // ms between updates
+        let updateInterval;
+        let tooltipTimeout;
+        let activeCars = 0;
+        let totalPassengers = 0;
+
+        // Move this function outside of any event handler
+        function populateLocationSelect() {
+            const locationSelect = document.getElementById("locationSelect");
+            locationSelect.innerHTML = '';
+            Object.keys(ROUTE_COORDINATES).forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                option.textContent = location;
+                locationSelect.appendChild(option);
+            });
+            
+            // Also populate pick-up and drop-off selects for custom booking
+            const pickupSelect = document.getElementById("pickupSelect");
+            const dropoffSelect = document.getElementById("dropoffSelect");
+            
+            if (pickupSelect) pickupSelect.innerHTML = '';
+            if (dropoffSelect) dropoffSelect.innerHTML = '';
+            
+            Object.keys(ROUTE_COORDINATES).forEach(location => {
+                if (pickupSelect) {
+                    const option = document.createElement('option');
+                    option.value = location;
+                    option.textContent = location;
+                    pickupSelect.appendChild(option);
+                }
+                
+                if (dropoffSelect) {
+                    const option = document.createElement('option');
+                    option.value = location;
+                    option.textContent = location;
+                    dropoffSelect.appendChild(option);
+                }
+            });
+        }
+
+        // Main update function
+        function updateSimulation() {
+            console.log("Updating simulation...");
+            
+            fetch('/simulation_status')
+                .then(response => {
+                    console.log("Got response from simulation_status");
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Processing simulation data");
+                    
+                    try {
+                        updateCarPositions(data.cars); // Update car positions on the map
+                        updateRequestMarkers(data.requests); // Update request markers on the map
+                        updateInfo(data.cars, data.requests);
+                        
+                        // Update statistics
+                        activeCars = data.cars.filter(car => car.active).length;
+                        totalPassengers = data.cars.reduce((sum, car) => sum + car.passenger_count, 0);
+                        document.getElementById('active-cars').textContent = activeCars;
+                        document.getElementById('total-passengers').textContent = totalPassengers;
+                        document.getElementById('pending-requests').textContent = data.requests.length;
+                        
+                        // Check if a car was automatically added due to demand
+                        if (data.auto_added_car) {
+                            showToast(`🚗 New car ${data.auto_added_car.id} automatically added at ${data.auto_added_car.location} due to high demand!`, 'info-toast');
+                        }
+                        
+                        console.log("Simulation update complete");
+                    } catch (error) {
+                        console.error("Error updating simulation UI:", error);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching simulation status:', err);
+                });
+        }
+
+        // Update car and request info in the sidebar
+        function updateInfo(cars, requests) {
+            const carsInfo = document.getElementById('cars-info');
+            const requestsInfo = document.getElementById('requests-info');
+            
+            carsInfo.innerHTML = '';
+            
+            // Group cars by active/inactive for better display
+            const activeCars = cars.filter(car => car.active);
+            const inactiveCars = cars.filter(car => !car.active);
+            
+            // First show active cars
+            activeCars.forEach(car => {
+                const carCard = document.createElement('div');
+                carCard.className = 'car-card';
+                carCard.innerHTML = `
+                    <div class="card-header">
+                        <span>${car.id}</span>
+                        <span class="passenger-count">${car.passenger_count}/${car.capacity}</span>
+                    </div>
+                    <div class="route">${car.current_location} → ${car.destination}</div>
+                    <div class="status-badge active-badge">Active</div>
+                    <div class="passengers-list">
+                        ${car.passengers.map(p => `${p.id}: ${p.pickup} → ${p.dropoff}`).join('<br>')}
+                    </div>
+                `;
+                
+                // Add click event to highlight car on map
+                carCard.addEventListener('click', () => {
+                    const marker = carMarkers[car.id];
+                    if (marker) {
+                        marker.openPopup();
+                        map.panTo(marker.getLatLng());
+                    }
+                });
+                
+                carsInfo.appendChild(carCard);
+            });
+            
+            // Then show inactive cars with different styling
+            inactiveCars.forEach(car => {
+                const carCard = document.createElement('div');
+                carCard.className = 'car-card inactive-car';
+                carCard.innerHTML = `
+                    <div class="card-header">
+                        <span>${car.id}</span>
+                        <span class="passenger-count">${car.passenger_count}/${car.capacity}</span>
+                    </div>
+                    <div class="route">${car.current_location} → ${car.destination}</div>
+                    <div class="status-badge inactive-badge">Inactive</div>
+                `;
+                carsInfo.appendChild(carCard);
+            });
+            
+            // Update requests info
+            requestsInfo.innerHTML = '';
+            requests.forEach(request => {
+                const requestCard = document.createElement('div');
+                requestCard.className = 'request-card';
+                requestCard.innerHTML = `
+                    <div class="card-header">
+                        <span>Request ${request.id}</span>
+                    </div>
+                    <div class="request-details">
+                        <div>From: ${request.pickup}</div>
+                        <div>To: ${request.dropoff}</div>
+                    </div>
+                `;
+                requestsInfo.appendChild(requestCard);
+            });
+        }
+
+        // Fallback functions if map fails to initialize
+        function updateCarPositions(cars) {
+            if (window.mapInitialized && window.mapFunctions) {
+                window.mapFunctions.updateCarPositions(cars);
+            } else {
+                console.log("Map not initialized, skipping updateCarPositions");
+            }
+        }
+
+        function updateRequestMarkers(requests) {
+            if (window.mapInitialized && window.mapFunctions) {
+                window.mapFunctions.updateRequestMarkers(requests);
+            } else {
+                console.log("Map not initialized, skipping updateRequestMarkers");
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize map with a try-catch block to handle errors
+            try {
+                window.mapFunctions.initMap();
+                console.log("Map initialized successfully");
+            } catch (error) {
+                console.error("Error initializing map:", error);
+            }
+            
+            // Populate location select in add car modal
+            populateLocationSelect();
+            
+            // Set up speed control
+            const speedControl = document.getElementById('speed-control');
+            const speedValue = document.getElementById('speed-value');
+            
+            speedControl.addEventListener('input', function() {
+                const speeds = ["Very Slow", "Slow", "Normal", "Fast", "Very Fast"];
+                speedValue.textContent = speeds[this.value - 1];
+                simulationSpeed = 3000 / this.value;
+                
+                if (updateInterval) {
+                    clearInterval(updateInterval);
+                    updateInterval = setInterval(updateSimulation, simulationSpeed);
+                }
+            });
+            
+            // Set up the map control buttons
+            document.getElementById('zoomToRoute').addEventListener('click', function() {
+                // Create a bounds object with all locations
+                const bounds = L.latLngBounds();
+                Object.values(ROUTE_COORDINATES).forEach(coords => {
+                    bounds.extend(L.latLng(coords));
+                });
+                map.fitBounds(bounds, { padding: [50, 50] });
+            });
+            
+            document.getElementById('toggleTraffic').addEventListener('click', function() {
+                const btn = this;
+                const isTrafficEnabled = window.mapFunctions.toggleTrafficLayer();
+                
+                if (isTrafficEnabled) {
+                    btn.textContent = 'Hide Traffic';
+                    showToast('Showing simulated traffic congestion');
+                } else {
+                    btn.textContent = 'Show Traffic';
+                    showToast('Traffic layer hidden');
+                }
+            });
+            
+            // Add a new button for enabling click-to-add car mode
+            const mapControls = document.querySelector('.map-controls');
+            const clickToAddBtn = document.createElement('button');
+            clickToAddBtn.id = 'enableClickToAddCar';
+            clickToAddBtn.textContent = 'Click to Add Car';
+            clickToAddBtn.addEventListener('click', function() {
+                const btn = this;
+                if (btn.textContent === 'Click to Add Car') {
+                    window.mapFunctions.enableMapClickToAddCar();
+                    btn.textContent = 'Cancel';
+                    btn.style.backgroundColor = '#e63946';
+                } else {
+                    window.mapFunctions.disableMapClickToAddCar();
+                    btn.textContent = 'Click to Add Car';
+                    btn.style.backgroundColor = '#3388ff';
+                }
+            });
+            mapControls.appendChild(clickToAddBtn);
+            
+            // Set up buttons
+            document.getElementById('startBtn').addEventListener('click', function() {
+                console.log("Start button clicked");
+                
+                fetch('/start_simulation', { method: 'POST' })
+                    .then(response => {
+                        console.log("Response received:", response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Simulation started:", data);
+                        showToast('Simulation started');
+                        // Start updating the UI regularly
+                        if (updateInterval) {
+                            clearInterval(updateInterval);
+                        }
+                        updateInterval = setInterval(updateSimulation, simulationSpeed);
+                        updateSimulation(); // Immediate first update
+                    })
+                    .catch(error => {
+                        console.error("Error starting simulation:", error);
+                    });
+            });
+            
+            document.getElementById('stopBtn').addEventListener('click', function() {
+                fetch('/stop_simulation', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.status);
+                        showToast('Simulation stopped');
+                        if (updateInterval) {
+                            clearInterval(updateInterval);
+                            updateInterval = null;
+                        }
+                    });
+            });
+            
+            document.getElementById('randomRequestBtn').addEventListener('click', function() {
+                const btn = this;
+                btn.disabled = true;
+                btn.textContent = "Adding...";
+                
+                fetch('/add_random_request', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.status);
+                        showToast(`New request added: ${data.request.pickup} to ${data.request.dropoff}`);
+                        // Update immediately after adding a request
+                        updateSimulation();
+                        btn.disabled = false;
+                        btn.textContent = "New Request";
+                    })
+                    .catch(() => {
+                        btn.disabled = false;
+                        btn.textContent = "New Request";
+                    });
+            });
+            
+            // Modal handling
+            const modal = document.getElementById("addCarModal");
+            const addCarBtn = document.getElementById("addCarBtn");
+            const closeBtn = document.querySelector(".close");
+            const confirmBtn = document.getElementById("confirmAddCar");
+            const locationSelect = document.getElementById("locationSelect");
+            
+            addCarBtn.addEventListener("click", function() {
+                modal.style.display = "block";
+            });
+            
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+            
+            window.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+            
+            confirmBtn.addEventListener("click", function() {
+                const location = locationSelect.value;
+                const direction = document.querySelector('input[name="direction"]:checked').value;
+                
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = "Adding...";
+                
+                fetch('/add_car', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        location: location,
+                        direction: direction
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Car added:", data);
+                    modal.style.display = "none";
+                    updateSimulation();
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = "Add Car";
+                    showToast(`New car ${data.car.id} added at ${data.car.location}`);
+                })
+                .catch(error => {
+                    console.error('Error adding car:', error);
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = "Add Car";
+                });
+            });
+
+            document.getElementById('emergencyRequestBtn').addEventListener('click', function() {
+                // Populate emergency location select
+                const emergencySelect = document.getElementById('emergencyLocationSelect');
+                emergencySelect.innerHTML = '';
+                Object.keys(ROUTE_COORDINATES).forEach(location => {
+                    const option = document.createElement('option');
+                    option.value = location;
+                    option.textContent = location;
+                    emergencySelect.appendChild(option);
+                });
+                
+                document.getElementById('emergencyModal').style.display = 'block';
+            });
+
+            document.getElementById('findNearestCarBtn').addEventListener('click', function() {
+                const location = document.getElementById('emergencyLocationSelect').value;
+                window.mapFunctions.findNearestCar(location);
+                document.getElementById('emergencyModal').style.display = 'none';
+                
+                // Generate emergency request
+                fetch('/add_random_request', { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pickup: location
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showToast(`Emergency request added: ${location}`, 'info-toast');
+                    updateSimulation();
+                });
+            });
+
+            // Custom booking modal handling
+            const customBookingBtn = document.getElementById("customBookingBtn");
+            const customBookingModal = document.getElementById("customBookingModal");
+            const customBookingClose = customBookingModal.querySelector(".close");
+            const confirmBookingBtn = document.getElementById("confirmBooking");
+            
+            // Open custom booking modal
+            customBookingBtn.addEventListener("click", function() {
+                customBookingModal.style.display = "block";
+                // Ensure the location selects are populated
+                populateLocationSelect();
+            });
+            
+            // Close custom booking modal
+            customBookingClose.addEventListener("click", function() {
+                customBookingModal.style.display = "none";
+            });
+            
+            // Close modal when clicking outside of it
+            window.addEventListener("click", function(event) {
+                if (event.target === customBookingModal) {
+                    customBookingModal.style.display = "none";
+                }
+            });
+            
+            // Handle custom booking submission
+            confirmBookingBtn.addEventListener("click", function() {
+                const name = document.getElementById("passengerName").value.trim();
+                const pickup = document.getElementById("pickupSelect").value;
+                const dropoff = document.getElementById("dropoffSelect").value;
+                
+                // Basic validation
+                if (!name) {
+                    showToast("Please enter your name", "error-toast");
+                    return;
+                }
+                
+                if (pickup === dropoff) {
+                    showToast("Pickup and dropoff locations cannot be the same", "error-toast");
+                    return;
+                }
+                
+                // Disable button to prevent multiple submissions
+                confirmBookingBtn.disabled = true;
+                confirmBookingBtn.textContent = "Booking...";
+                
+                // Send custom booking request to server
+                fetch('/add_custom_request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        pickup: pickup,
+                        dropoff: dropoff
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Custom booking added:", data);
+                    customBookingModal.style.display = "none";
+                    updateSimulation(); // Update immediately after adding request
+                    
+                    // Reset form
+                    document.getElementById("passengerName").value = "";
+                    
+                    // Show success notification
+                    showToast(`Custom booking for ${name} created successfully!`, 'success-toast');
+                    confirmBookingBtn.disabled = false;
+                    confirmBookingBtn.textContent = "Book Now";
+                })
+                .catch(error => {
+                    console.error('Error adding custom booking:', error);
+                    showToast("Error creating booking. Please try again.", "error-toast");
+                    confirmBookingBtn.disabled = false;
+                    confirmBookingBtn.textContent = "Book Now";
+                });
+            });
+            
+            // Add show toast function if it doesn't exist
+            if (typeof showToast !== 'function') {
+                window.showToast = function(message, type = 'success-toast') {
+                    // Create toast element if it doesn't exist
+                    let toast = document.getElementById('toast');
+                    if (!toast) {
+                        toast = document.createElement('div');
+                        toast.id = 'toast';
+                        toast.style.position = 'fixed';
+                        toast.style.bottom = '20px';
+                        toast.style.right = '20px';
+                        toast.style.padding = '16px';
+                        toast.style.borderRadius = '4px';
+                        toast.style.zIndex = '1000';
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'opacity 0.5s';
+                        document.body.appendChild(toast);
+                    }
+                    
+                    // Set style based on type
+                    if (type === 'success-toast') {
+                        toast.style.backgroundColor = '#4CAF50';
+                        toast.style.color = 'white';
+                    } else if (type === 'info-toast') {
+                        toast.style.backgroundColor = '#2196F3';
+                        toast.style.color = 'white';
+                    } else if (type === 'error-toast') {
+                        toast.style.backgroundColor = '#f44336';
+                        toast.style.color = 'white';
+                    }
+                    
+                    // Set message and display
+                    toast.textContent = message;
+                    toast.style.opacity = '1';
+                    
+                    // Hide after 3 seconds
+                    setTimeout(() => {
+                        toast.style.opacity = '0';
+                    }, 3000);
+                }
+            }
+            
+        });
+    </script>
+</body>
+</html>
